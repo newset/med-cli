@@ -1,16 +1,16 @@
 /**
- * @file  {{name}}.js
+ * @file  demo.js
  * @copyright  2017 | Medlinker
- * @date  {{date}}
+ * @date  2017-03-28 19:40
  */
 define( [
-	'{{view}}',
+	'BaseView',
 	'Model',
 	'text!./index.html',
     'text!StylePath/common.css',
 	'text!./style.css'
 ], function (
-	{{view}},
+	BaseView,
 	Model,
 	template,
 	commonstyle
@@ -18,7 +18,7 @@ define( [
 ) {
 	// 变量初始化
 
-	return _.inherit({{view}}, {
+	return _.inherit(BaseView, {
 		propertys: function($super){
 			$super();
 			

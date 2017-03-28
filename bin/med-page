@@ -19,7 +19,7 @@ process.on('exit', function () {
 
 var name = program.args && program.args[0];
 var list = program.list;
-var pageFolder = path.resolve('pages');
+var pageFolder = path.resolve('./pages');
 var source = path.resolve(__dirname + '/../source/page'),
 	dest = path.resolve("./pages/" + name);
 

@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+
+var os = require('os')
+var path = require('path')
+var fs = require('fs-extra')
+var exists = fs.existsSync
+var program = require('./med')
+
+var download = require('download-git-repo')
+
+program
+	.option('-l, --list', '是否为列表视图');
+program.parse(process.argv);
+
+console.log()
+process.on('exit', function () {
+  console.log()
+})
+
+var name = program.args && program.args[0];
+var list = program.list;
+var pageFolder = path.resolve('pages');
+var source = path.resolve(__dirname + '/../source/page/page'),
+	dest = path.resolve("./pages/" + name);
+
+/**
+ * [noop description]
+ * @return {[type]} [description]
+ */
+function noop() {
+	return false;
+}
+
+function run () {
+	if (!exists(pageFolder)) {
+		console.error('pages 文件夹不存在');
+	}
+
+	fs.copy(source, dest, {
+		filter: function(src) {
+			return list || !src.match(/list\.(js|html)/);
+		}
+	}, function(err) {
+		fs.move(path.resolve(dest, "index.js"), path.resolve(dest, name +'.js'), {
+			overwrite: true
+		}, noop)
+
+		fs.move(path.resolve(dest, "_style.less"), path.resolve(dest, 'style.less'), {
+			overwrite: true
+		}, noop);
+
+		console.info("完成新建页面: ", name);
+	});
+}
+
+run();

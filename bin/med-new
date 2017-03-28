@@ -1,0 +1,68 @@
+#!/usr/bin/env node
+
+var ora = require('ora')
+var download = require('download-git-repo')
+var inquirer = require('inquirer')
+var program = require('./med')
+var generate = require('../lib/generate')
+
+var exists = require('fs').existsSync
+var os = require('os')
+var path = require('path')
+
+console.log()
+process.on('exit', function () {
+  console.log()
+})
+
+/**
+ * Usage.
+ */
+
+program
+  .usage('<project-name> [template-name]')
+
+var argName = program.args && program.args[0]
+var inPlace = !argName || argName === '.'
+var to = path.resolve(argName || '.')
+var name = inPlace ? path.relative('../', process.cwd()) : argName
+var template = 'med-templates/'+'hybrid',
+	clone = false;
+
+if (exists(to)) {
+  inquirer.prompt([{
+    type: 'confirm',
+    message: inPlace
+      ? '是否在当前目录创建项目?'
+      : '目录已存在，是否继续?',
+    name: 'ok'
+  }])
+  .then(function (answers) {
+    if (answers.ok) {
+      run()
+    }
+  }, function (error) {
+    console.log('test', error);
+  })
+} else {
+  run()
+}
+
+function run() {
+	downloadTemplate(template);
+}
+
+function downloadTemplate (template) {
+  var tmp = os.tmpdir() + '/'+ template
+	var spinner = ora('downloading template')
+	spinner.start()
+	download(template, tmp, { clone: clone }, function (err) {
+		spinner.stop()
+
+		generate(name, tmp, to, function(err) {
+			if (!err) {
+				console.log('finished');
+			}
+		})
+	});
+} 

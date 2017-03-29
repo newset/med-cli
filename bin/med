@@ -2,11 +2,11 @@
 
 var program = require('commander');
 
-program.version(require('../package').version)
-  .usage('<command> [options]')
-  .command('page', 'generate a new page from a template')
-  .command('new', 'create new project')
-  .parse(process.argv);
+program
+	.version(require('../package').version)
+	.command('new', '新建项目')
+	.command('page', '新建子页面')
+	.command('watch', '监控文件变动')
+	.parse(process.argv);
 
 module.exports = program;
-

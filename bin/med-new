@@ -5,6 +5,7 @@ var download = require('download-git-repo')
 var inquirer = require('inquirer')
 var program = require('./med')
 var generate = require('../lib/generate')
+var chalk =require("chalk");
 
 var exists = require('fs').existsSync
 var os = require('os')
@@ -42,7 +43,7 @@ if (exists(to)) {
       run()
     }
   }, function (error) {
-    console.log('test', error);
+    console.log(chalk.red(error));
   })
 } else {
   run()
@@ -54,14 +55,14 @@ function run() {
 
 function downloadTemplate (template) {
   var tmp = os.tmpdir() + '/'+ template
-	var spinner = ora('downloading template')
+	var spinner = ora('下载初始文件')
 	spinner.start()
 	download(template, tmp, { clone: clone }, function (err) {
 		spinner.stop()
 
 		generate(name, tmp, to, function(err) {
 			if (!err) {
-				console.log('finished');
+				console.log(chalk.green('项目初始化完成'));
 			}
 		})
 	});

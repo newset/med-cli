@@ -7,6 +7,7 @@ var exists = fs.existsSync
 var program = require('./med')
 var render = require('consolidate').handlebars.render
 var download = require('download-git-repo')
+var chalk =require("chalk");
 
 program
 	.option('-l, --list', '是否为列表视图');
@@ -68,7 +69,7 @@ function run () {
  */
 function create() {
 	if (!exists(pageFolder)) {
-		console.error('pages 文件夹不存在');
+		console.error(chalk.yellow('创建 pages 文件夹'));
 	}
 
 	fs.copy(path.resolve(source, 'page'), dest, {
@@ -90,7 +91,7 @@ function create() {
 		fs.copySync(path.resolve(source, 'page.html'), htmlFile);
 		parse(htmlFile)
 
-		console.info("完成新建页面: ", name);
+		console.info(chalk.green("完成新建页面: "+name));
 	});
 }
 
@@ -112,7 +113,7 @@ function parse(file) {
 	    	if (!err) {
 		    	fs.outputFileSync(file, res);
 	    	} else {
-	    		console.log();
+	    		console.log(chalk.red(err));
 	    	}
 	    })
 	}

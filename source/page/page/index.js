@@ -6,7 +6,7 @@
 define( [
 	'{{view}}',
 	'Model',
-	'text!./index.html',
+	'text!./tpl.layout.html',
     'text!StylePath/common.css',
 	'text!./style.css'
 ], function (

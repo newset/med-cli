@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+
+var chokidar = require("chokidar");
+var path = require('path');
+var fs = require('fs-extra');
+var less = require("less");
+// var program = require('./med');
+var chalk = require("chalk");
+var cwd = path.resolve(".");
+
+// program.parse(process.argv);
+
+console.log()
+process.on('exit', function () {
+  console.log()
+})
+
+watch();
+
+function watch () {
+	var dir = process.cwd(),
+		type = {
+			add: "创建",
+			change: "修改"
+		}
+		ready = false;
+	var watcher = chokidar.watch(dir, {
+		ignored: /(\/\.|node_modules|\.html|\.js)/,
+		persistent: true,
+		interval: 1000,
+		awaitWriteFinish: {
+		    stabilityThreshold: 2000,
+		    pollInterval: 100
+		}
+	})
+	.on('ready', function(){
+		var watchedPaths = watcher.getWatched();
+		console.log(chalk.blue("正在监控当前文件夹..."));
+		console.log();
+		ready = true;
+	})
+	.on("all", function(event, path) {
+		if (path.match(/^\_/)) {
+			return
+		}
+
+		// 仅处理 less 文件
+		if (ready && path.match(/\.less/) && (event == 'add' || event == 'change')) {
+			// compile(path);
+			console.log(chalk.green(type[event], path));
+		}
+	})
+
+	return watcher;
+}
+
+function compile(file) {
+	var str = fs.readFileSync(file, 'utf8');
+
+	less.render(str, function (e, output) {
+		console.log(output.css);
+    	fs.outputFileSync(file, output.css);
+	});
+}
+
+module.exports = watch;

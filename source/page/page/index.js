@@ -13,7 +13,7 @@ define( [
 	{{view}},
 	Model,
 	template,
-	commonstyle
+	commonstyle,
 	style
 ) {
 	// 变量初始化

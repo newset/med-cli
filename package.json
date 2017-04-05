@@ -1,6 +1,6 @@
 {
   "name": "med-cli",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "index.js",
   "repository": {},
   "license": "MIT",
@@ -20,8 +20,6 @@
     "less": "^2.7.2",
     "metalsmith": "^2.3.0",
     "ora": "^1.2.0",
-    "request": "^2.81.0",
-    "requirejs": "^2.3.3",
-    "rimraf": "^2.6.1"
+    "request": "^2.81.0"
   }
 }

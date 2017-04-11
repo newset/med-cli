@@ -24,7 +24,7 @@ define( [
 			
 			this.style = style;
 			this.commonstyle = commonstyle;
-
+			this.template = template;
 		}
 	})
 } );

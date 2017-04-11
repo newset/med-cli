@@ -8,6 +8,7 @@ var program = require('./med')
 var render = require('consolidate').handlebars.render
 var download = require('download-git-repo')
 var chalk =require("chalk");
+var less = require("less");
 
 program
 	.option('-l, --list', '是否为列表视图');
@@ -85,7 +86,10 @@ function create() {
 
 		fs.move(path.resolve(dest, "_style.less"), path.resolve(dest, 'style.less'), {
 			overwrite: true
-		}, noop);
+		}, function(){
+			// less 编译
+			
+		});
 
 		var htmlFile = path.resolve(name+".html")
 		fs.copySync(path.resolve(source, 'page.html'), htmlFile);

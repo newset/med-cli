@@ -3,7 +3,7 @@
 var chokidar = require("chokidar");
 var path = require('path');
 var fs = require('fs-extra');
-var less = require("less");
+var less = require("../lib/less");
 // var program = require('./med');
 var chalk = require("chalk");
 var cwd = path.resolve(".");
@@ -46,28 +46,12 @@ function watch () {
 
 		// 仅处理 less 文件
 		if (ready && path.match(/\.less/) && (event == 'add' || event == 'change')) {
-			compile(path, dir);
+			less.compile(path, dir);
 			console.log(chalk.green(type[event], path));
 		}
 	})
 
 	return watcher;
-}
-
-function compile(file, folder) {
-	var str = fs.readFileSync(file, 'utf8');
-	var fileDir = file.replace(/[^\/]+\.less$/, "")
-	less.render(str, {
-		paths: ['.', './lib', folder, fileDir]
-	}, function (e, output) {
-
-		if (e) {
-			console.log(chalk.red(e));
-			return
-		}
-		var dest = file.replace(".less", ".css");
-    	fs.outputFileSync(dest, output.css);
-	});
 }
 
 module.exports = watch;

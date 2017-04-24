@@ -1,2 +1,21 @@
 #!/usr/bin/env node
+var path = require("path");
+var git = require("../lib/git");
+
+var dir = process.cwd();
+var pkg = require(path.join(dir, 'package.json'));
+var host = pkg.jenkins || "https://jenkins.medlinker.com/jenkins/job/" + pkg.name
+
+var url = host + "/buildWithParameters?branch=develop"
+var cmd = "curl -X GET " +  url + " --user luojie:ljmedlinker";
+
+// 提交代码
+git.commit()
+	.then(function(){
+		// 调用 jenkins
+		git.exec(cmd)
+			.then(function(out) {
+				console.log(out);
+			})
+	});
 

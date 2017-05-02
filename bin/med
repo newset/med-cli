@@ -7,6 +7,8 @@ program
 	.command('new', '新建项目')
 	.command('page', '新建子页面')
 	.command('watch', '监控文件变动')
+	.command('build', '提交代码并触发构建')
+	.command('deploy', '发布releas分支')
 	.parse(process.argv);
 
 module.exports = program;

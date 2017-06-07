@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+
+var os = require('os')
+var path = require('path')
+var fs = require('fs-extra')
+var exists = fs.existsSync
+var program = require('./med')
+var render = require('consolidate').handlebars.render
+var download = require('download-git-repo')
+var chalk = require("chalk");
+var less = require("less");
+
+console.log()
+process.on('exit', function() {
+    console.log()
+})
+
+/**
+ * 在common 目录中创建bind.view
+ * 在comps目录中创建 vue/lib, vue/comps 目录 以及 plugin.js
+ */
+function init() {
+
+}
+
+init();

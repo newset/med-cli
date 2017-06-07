@@ -7,48 +7,61 @@ var exists = fs.existsSync
 var program = require('./med')
 var render = require('consolidate').handlebars.render
 var download = require('download-git-repo')
-var chalk =require("chalk");
+var chalk = require("chalk");
 var less = require("less");
 
+var pageFolder = path.resolve('./pages');
+var source = path.resolve(__dirname + '/../source/page'),
+    dest;
+
 program
-	.option('-l, --list', '是否为列表视图');
+    .option('-t, --type <view>', '视图类型')
+    .action(function(name, opts) {
+        console.log('opts: ', opts.type, name);
+        dest = path.resolve("./pages/" + name);
+
+        switch (opts.type) {
+            case 'bind':
+                run(name, opts.type);
+                break;
+            case 'list':
+                run(name);
+                break;
+            default:
+                break;
+        }
+    });
 program.parse(process.argv);
 
 console.log()
-process.on('exit', function () {
-  console.log()
+process.on('exit', function() {
+    console.log()
 })
 
-var name = program.args && program.args[0];
-var list = program.list;
-var pageFolder = path.resolve('./pages');
-var source = path.resolve(__dirname + '/../source/page'),
-	dest = path.resolve("./pages/" + name);
-
 if (typeof(Date.prototype.format) === "undefined") {
-	Date.prototype.format = function (format) {
-		var date = {
-			"M+": this.getMonth() + 1,
-			"d+": this.getDate(),
-			"h+": this.getHours(),
-			"m+": this.getMinutes(),
-			"s+": this.getSeconds(),
-			"q+": Math.floor((this.getMonth() + 3) / 3),
-			"S+": this.getMilliseconds()
-		};
-		if (/(y+)/i.test(format)) {
-			format = format.replace(RegExp.$1, (this.getFullYear() + '')
-				.substr(4 - RegExp.$1.length));
-		}
-		for (var k in date) {
-			if (new RegExp("(" + k + ")")
-				.test(format)) {
-				format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? date[k] : ("00" + date[k])
-					.substr(("" + date[k]).length));
-			}
-		}
-		return format;
-	}
+    Date.prototype.format = function(format) {
+        var date = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '')
+                .substr(4 - RegExp.$1.length));
+        }
+        for (var k in date) {
+            if (new RegExp("(" + k + ")")
+                .test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? date[k] : ("00" + date[k])
+                    .substr(("" + date[k]).length));
+            }
+        }
+        return format;
+    }
 }
 
 
@@ -57,46 +70,45 @@ if (typeof(Date.prototype.format) === "undefined") {
  * @return {[type]} [description]
  */
 function noop() {
-	return false;
+    return false;
 }
 
-function run () {
-	create();
+function run(name, type) {
+    create(name, type);
 }
 
 /**
  * 创建页面文件
  * @return {[type]} [description]
  */
-function create() {
-	if (!exists(pageFolder)) {
-		console.error(chalk.yellow('创建 pages 文件夹'));
-	}
+function create(name, type) {
+    if (!exists(pageFolder)) {
+        console.error(chalk.yellow('创建 pages 文件夹'));
+    }
 
-	fs.copy(path.resolve(source, 'page'), dest, {
-		filter: function(src) {
-			return list || !src.match(/list\.(js|html)/);
-		}
-	}, function(err) {
-		fs.move(path.resolve(dest, "index.js"), path.resolve(dest, name +'.js'), {
-			overwrite: true
-		}, function() {
-			parse(path.resolve(dest, name +'.js'));
-		})
+    var typeFolder = type || 'page';
 
-		fs.move(path.resolve(dest, "_style.less"), path.resolve(dest, 'style.less'), {
-			overwrite: true
-		}, function(){
-			// less 编译
-			
-		});
+    // return console.log("dest: ", dest, name, typeFolder);
+    fs.copy(path.resolve(source, typeFolder), dest, function(err) {
+        fs.move(path.resolve(dest, "index.js"), path.resolve(dest, name + '.js'), {
+            overwrite: true
+        }, function() {
+            parse(path.resolve(dest, name + '.js'), name);
+        })
 
-		var htmlFile = path.resolve(name+".html")
-		fs.copySync(path.resolve(source, 'page.html'), htmlFile);
-		parse(htmlFile)
+        fs.move(path.resolve(dest, "_style.less"), path.resolve(dest, 'style.less'), {
+            overwrite: true
+        }, function() {
+            // less 编译
 
-		console.info(chalk.green("完成新建页面: "+name));
-	});
+        });
+
+        var htmlFile = path.resolve(name + ".html")
+        fs.copySync(path.resolve(source, 'page.html'), htmlFile);
+        parse(htmlFile, name)
+
+        console.info(chalk.green("完成新建页面: " + name));
+    });
 }
 
 /**
@@ -104,23 +116,21 @@ function create() {
  * @param  {string} file 文件路径
  * @return {[type]}      [description]
  */
-function parse(file) {
-	var str = fs.readFileSync(file, 'utf8');
+function parse(file, name) {
+    var str = fs.readFileSync(file, 'utf8');
 
-	// outputFileSync
-	if (str) {
-	    render(str, {
-	    	name: name,
-	    	date: new Date().format("yyyy-MM-dd hh:mm"),
-	    	view: list ? 'ListView': 'BaseView'
-	    }, function (err, res) {
-	    	if (!err) {
-		    	fs.outputFileSync(file, res);
-	    	} else {
-	    		console.log(chalk.red(err));
-	    	}
-	    })
-	}
+    // outputFileSync
+    if (str) {
+        render(str, {
+            name: name,
+            date: new Date().format("yyyy-MM-dd hh:mm"),
+            view: 'BaseView'
+        }, function(err, res) {
+            if (!err) {
+                fs.outputFileSync(file, res);
+            } else {
+                console.log(chalk.red(err));
+            }
+        })
+    }
 }
-
-run();

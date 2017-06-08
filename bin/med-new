@@ -5,15 +5,15 @@ var download = require('download-git-repo')
 var inquirer = require('inquirer')
 var program = require('./med')
 var generate = require('../lib/generate')
-var chalk =require("chalk");
+var chalk = require("chalk");
 
 var exists = require('fs').existsSync
 var os = require('os')
 var path = require('path')
 
 console.log()
-process.on('exit', function () {
-  console.log()
+process.on('exit', function() {
+    console.log()
 })
 
 /**
@@ -21,49 +21,53 @@ process.on('exit', function () {
  */
 
 program
-  .usage('<project-name> [template-name]')
+    .usage('<project-name> [template-name]')
 
 var argName = program.args && program.args[0]
 var inPlace = !argName || argName === '.'
 var to = path.resolve(argName || '.')
 var name = inPlace ? path.relative('../', process.cwd()) : argName
-var template = 'med-templates/'+'hybrid',
-	clone = false;
+var template = 'med-templates/' + 'hybrid',
+    clone = false;
 
 if (exists(to)) {
-  inquirer.prompt([{
-    type: 'confirm',
-    message: inPlace
-      ? '是否在当前目录创建项目?'
-      : '目录已存在，是否继续?',
-    name: 'ok'
-  }])
-  .then(function (answers) {
-    if (answers.ok) {
-      run()
-    }
-  }, function (error) {
-    console.log(chalk.red(error));
-  })
+    inquirer.prompt([{
+            type: 'confirm',
+            message: inPlace ?
+                '是否在当前目录创建项目?' : '目录已存在，是否继续?',
+            name: 'ok'
+        }])
+        .then(function(answers) {
+            if (answers.ok) {
+                run()
+            }
+        }, function(error) {
+            console.log(chalk.red(error));
+        })
 } else {
-  run()
+    run()
 }
 
 function run() {
-	downloadTemplate(template);
+    downloadTemplate(template);
 }
 
-function downloadTemplate (template) {
-  var tmp = os.tmpdir() + '/'+ template
-	var spinner = ora('下载初始文件')
-	spinner.start()
-	download(template, tmp, { clone: clone }, function (err) {
-		spinner.stop()
+function downloadTemplate(template) {
+    var tmp = os.tmpdir() + '/' + template
+    var spinner = ora('下载初始文件')
+    spinner.start()
+    download(template, tmp, { clone: clone }, function(err) {
+        spinner.stop()
 
-		generate(name, tmp, to, function(err) {
-			if (!err) {
-				console.log(chalk.green('项目初始化完成'));
-			}
-		})
-	});
-} 
+        if (err) {
+            console.log("错误: ", err);
+        }
+        generate(name, tmp, to, function(err) {
+            if (!err) {
+                console.log(chalk.green('项目初始化完成'));
+            } else {
+                console.log("错误: ", err);
+            }
+        })
+    });
+}

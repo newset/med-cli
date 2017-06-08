@@ -17,7 +17,6 @@ var source = path.resolve(__dirname + '/../source/page'),
 program
     .option('-t, --type <view>', '视图类型')
     .action(function(name, opts) {
-        console.log('opts: ', opts.type, name);
         dest = path.resolve("./pages/" + name);
 
         switch (opts.type) {
@@ -25,9 +24,10 @@ program
                 run(name, opts.type);
                 break;
             case 'list':
-                run(name);
+                run(name, 'list');
                 break;
             default:
+                run(name, 'page');
                 break;
         }
     });

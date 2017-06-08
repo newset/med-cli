@@ -23,7 +23,7 @@ med new project
 med page home -t bind
 ```
 该命令使用 source/page 目录里的文件进行创建
-- t 设置新建模板类型
+- -t 设置新建模板类型
 目前类型有 page | bind
 推荐使用bind， 基于vuejs 的 view.
 

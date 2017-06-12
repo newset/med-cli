@@ -20,9 +20,13 @@ med new project
 
 ## 新建页面
 ``` shell
-med page home
+med page home -t bind
 ```
 该命令使用 source/page 目录里的文件进行创建
+- -t 设置新建模板类型
+目前类型有 page | bind
+推荐使用bind， 基于vuejs 的 view.
+
 
 ## 监控 less 文件
 ``` shell
